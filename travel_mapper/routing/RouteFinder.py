@@ -3,20 +3,25 @@ from googlemaps.convert import decode_polyline
 import googlemaps
 from datetime import datetime
 import numpy as np
+import logging
 
+logging.basicConfig(level = logging.INFO)
 
 class RouteFinder:
     MAX_WAYPOINTS_API_CALL = 23
 
     def __init__(self, google_maps_api_key):
+
+        self.logger = logging.getLogger(__name__)
+        self.logger.setLevel(logging.INFO)
         self.mapper = RouteMapper()
         self.gmaps = googlemaps.Client(key=google_maps_api_key)
 
     def generate_route(self, list_of_places, itinerary, include_map=True):
-        print("# " * 20)
-        print("PROPOSED ITINERARY")
-        print("# " * 20)
-        print(itinerary)
+        self.logger.info("# " * 20)
+        self.logger.info("PROPOSED ITINERARY")
+        self.logger.info("# " * 20)
+        self.logger.info(itinerary)
 
         directions, sampled_route, mapping_dict = self.build_route_segments(
             list_of_places
@@ -29,7 +34,7 @@ class RouteFinder:
         return directions, sampled_route, mapping_dict
 
     def build_route_segments(
-        self, list_of_places, verbose=True, sample_route_points=10000
+        self, list_of_places, verbose=True, sample_route_points=5000
     ):
         number_of_stops = len(list_of_places["waypoints"])
 
@@ -40,6 +45,8 @@ class RouteFinder:
 
         # if this is true, we need to make several API calls to collect the entire route
         if number_of_stops > self.MAX_WAYPOINTS_API_CALL:
+
+            self.logger.info("Number of stops ({}) > MAX_WAYPOINTS_PER_CALL ({}), going to make several calls to Google Maps API".format(number_of_stops,self.MAX_WAYPOINTS_API_CALL))
             starting_point = list_of_places["start"]
             segment_id = 0
             for segment_start in range(0, number_of_stops, self.MAX_WAYPOINTS_API_CALL):
@@ -62,8 +69,8 @@ class RouteFinder:
                 )
 
                 if verbose:
-                    print("# " * 10)
-                    print("Getting directions for segment {}".format(segment_id))
+                    self.logger.info("# " * 10)
+                    self.logger.info("Getting directions for segment {}".format(segment_id))
 
                 directions, route = self.build_directions_and_route(
                     mapping_dict, verbose=verbose
@@ -89,14 +96,17 @@ class RouteFinder:
 
         # if we can just do one API call to Google Maps, then the process is simpler
         else:
+
+            self.logger.info("Assembling mapping dictionary")
             mapping_dict = self.build_mapping_dict(
                 list_of_places["start"],
                 list_of_places["end"],
                 waypoints=list_of_places["waypoints"],
             )
 
+            self.logger.info("Calling Google Maps API to get directions")
             directions, route = self.build_directions_and_route(mapping_dict)
-            sampled_route = self.sample_route_with_legs(route, npoints=10000)
+            sampled_route = self.sample_route_with_legs(route, npoints=sample_route_points)
 
         return directions, sampled_route, mapping_dict
 
@@ -173,12 +183,12 @@ class RouteFinder:
             # start and end locations but we need to warn the user that the map won't contain
             # the waypoints
 
-            print(
+            self.logger.warning(
                 "WARNING, some of the waypoints {} seem to"
                 "have caused issues with the google maps api".format(waypoints)
             )
 
-            print(
+            self.logger.warning(
                 "Directions will just be between start {} and end {}".format(start, end)
             )
 
@@ -241,7 +251,7 @@ class RouteFinder:
 
     @staticmethod
     def sample_route_with_legs(route, npoints=1000):
-        nlegs = len(route.keys())
+
         points_per_leg = [len(v["route"]) for k, v in route.items()]
         total_points = sum(points_per_leg)
 
@@ -254,7 +264,7 @@ class RouteFinder:
         for leg_id, route_info in route.items():
             total_points = int(points_per_leg[leg_id])
             total_sampled_points = int(frac_per_leg[leg_id])
-            step_size = total_points // total_sampled_points
+            step_size = int(max(total_points // total_sampled_points,1.0))
             route_sampled = [
                 route_info["route"][idx] for idx in range(0, total_points, step_size)
             ]

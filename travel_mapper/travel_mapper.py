@@ -15,12 +15,14 @@ def test(query=None):
 
     if not query:
         query = """
-        I want to do a 30 day trip from Cape Town to Windhoek.
-        I want to see some national parks and desert landscapes.
-        I don't want to drive more than 3 hours per day.
+        I want to do 3 week trip from Berkeley CA to New York City.
+        I want to visit national parks and cities with good food.
+        I want use a rental car and drive for no more than 3 hours on any given day. 
         """
 
+    # set up agent
     travel_agent = Agent(open_ai_api_key=open_ai_key, debug=False)
+    # set up route calculator, which contains the mapper
     route_finder = RouteFinder(google_maps_api_key=google_maps_key)
 
     itinerary, list_of_places = travel_agent.suggest_travel(query)
