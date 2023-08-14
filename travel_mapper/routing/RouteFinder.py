@@ -179,16 +179,12 @@ class RouteFinder:
             )
 
             print(
-                "Directions will just be between start {} and end {}".format(start,end)
+                "Directions will just be between start {} and end {}".format(start, end)
             )
 
             directions_result = self.gmaps.directions(
-                start,
-                end,
-                units="metric",
-                optimize_waypoints=True
+                start, end, units="metric", optimize_waypoints=True
             )
-
 
         if verbose:
             print("# " * 10)
