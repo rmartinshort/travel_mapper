@@ -15,9 +15,9 @@ def test(query=None):
 
     if not query:
         query = """
-        I want to do a 7 day trip from Cape town to Windhoek,
-        stopping in major towns to experience local culture.
-        I don't want to drive more than 6 hours per day.
+        I want to do a 30 day trip from Cape Town to Windhoek.
+        I want to see some national parks and desert landscapes.
+        I don't want to drive more than 3 hours per day.
         """
 
     travel_agent = Agent(open_ai_api_key=open_ai_key, debug=False)

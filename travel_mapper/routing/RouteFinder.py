@@ -167,6 +167,29 @@ class RouteFinder:
             departure_time=start_time,
         )
 
+        if not directions_result:
+            # if we get here, the google maps call has failed. This is probably because
+            # the waypoints were not found. We can still make a map by just using the
+            # start and end locations but we need to warn the user that the map won't contain
+            # the waypoints
+
+            print(
+                "WARNING, some of the waypoints {} seem to"
+                "have caused issues with the google maps api".format(waypoints)
+            )
+
+            print(
+                "Directions will just be between start {} and end {}".format(start,end)
+            )
+
+            directions_result = self.gmaps.directions(
+                start,
+                end,
+                units="metric",
+                optimize_waypoints=True
+            )
+
+
         if verbose:
             print("# " * 10)
             print("Fetched directions")
