@@ -1,0 +1,7 @@
+googlemaps==4.10.0
+langchain==0.0.263
+openai==0.27.8
+folium==0.14.0
+branca==0.6.0
+python-dotenv==1.0.0
+black==23.7.0
