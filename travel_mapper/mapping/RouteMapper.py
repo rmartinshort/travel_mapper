@@ -2,11 +2,16 @@ from datetime import datetime
 import folium
 from branca.element import Figure
 from travel_mapper.constants import MAPS_DUMP_DIR
+import logging
 import os
+
+logging.basicConfig(level=logging.INFO)
 
 
 class RouteMapper:
     def __init__(self, h=500, w=1000):
+        self.logger = logging.getLogger(__name__)
+        self.logger.setLevel(logging.INFO)
         self.figure = Figure(height=h, width=w)
         self.map_name = "route_map.html"
         self.save_map = True
@@ -34,6 +39,7 @@ class RouteMapper:
         marker_points = []
 
         # extract the location points from the previous directions function
+        self.logger.info("Generating marker_points for map")
         for segment in directions_list:
             for leg in segment["legs"]:
                 leg_start_loc = leg["start_location"]
@@ -50,6 +56,8 @@ class RouteMapper:
             )
         )
 
+        self.logger.info("Setting up the map")
+
         map = folium.Map(location=map_start_loc, tiles="cartodbpositron", zoom_start=10)
 
         # Add waypoint markers to the map
@@ -62,6 +70,9 @@ class RouteMapper:
             ).add_to(map)
 
         # Add lines to the map
+
+        self.logger.info("Adding route segments to the map")
+
         for leg_id, route_points in route_dict.items():
             leg_distance = route_points["distance"]
             leg_duration = route_points["duration"]
@@ -77,6 +88,10 @@ class RouteMapper:
             f_group.add_to(map)
 
         if self.save_map:
+            self.logger.info("Saving map to {}/{}".format(MAPS_DUMP_DIR, self.map_name))
+            if not os.path.isdir(MAPS_DUMP_DIR):
+                self.logger.info("Generating maps dir {}".format(MAPS_DUMP_DIR))
+                os.mkdir(MAPS_DUMP_DIR)
             map.save(os.path.join(MAPS_DUMP_DIR, self.map_name))
 
         self.map = map

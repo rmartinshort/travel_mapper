@@ -7,6 +7,9 @@ from travel_mapper.agent.templates import (
 )
 from travel_mapper.constants import MODEL_NAME, TEMPERATURE
 import openai
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 
 class Agent(object):
@@ -16,6 +19,9 @@ class Agent(object):
         self.validation_prompt = ValidationTemplate()
         self.itinerary_prompt = ItineraryTemplate()
         self.mapping_prompt = MappingTemplate()
+
+        self.logger = logging.getLogger(__name__)
+        self.logger.setLevel(logging.INFO)
 
         self.validation_chain = self._set_up_validation_chain(debug)
         self.agent_chain = self._set_up_agent_chain(debug)
@@ -64,6 +70,9 @@ class Agent(object):
         return overall_chain
 
     def suggest_travel(self, query):
+        self.logger.info(
+            "Calling validation (model is {}) on user input".format(MODEL_NAME)
+        )
         validation_result = self.validation_chain(
             {
                 "query": query,
@@ -74,12 +83,17 @@ class Agent(object):
         validation_test = validation_result["validation_output"].dict()
 
         if validation_test["plan_is_valid"].lower() == "no":
+            self.logger.warning("User request was not valid!")
             print("\n######\n Travel plan is not valid \n######\n")
             print(validation_test["updated_request"])
             return validation_result, _
 
         else:
             # plan is valid
+
+            self.logger.info(
+                "User request is valid, calling agent (model is {})".format(MODEL_NAME)
+            )
 
             agent_result = self.agent_chain(
                 {
