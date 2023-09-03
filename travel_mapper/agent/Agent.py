@@ -12,7 +12,6 @@ import time
 
 logging.basicConfig(level=logging.INFO)
 
-
 class Agent(object):
     def __init__(self, open_ai_api_key, debug=True):
         openai.api_key = open_ai_api_key
@@ -22,6 +21,9 @@ class Agent(object):
         self.validation_prompt = ValidationTemplate()
         self.itinerary_prompt = ItineraryTemplate()
         self.mapping_prompt = MappingTemplate()
+
+        self.logger = logging.getLogger(__name__)
+        self.logger.setLevel(logging.INFO)
 
         self.validation_chain = self._set_up_validation_chain(debug)
         self.agent_chain = self._set_up_agent_chain(debug)
@@ -72,6 +74,9 @@ class Agent(object):
     def suggest_travel(self, query):
         self.logger.info("Validating query")
         t1 = time.time()
+        self.logger.info(
+            "Calling validation (model is {}) on user input".format(MODEL_NAME)
+        )
         validation_result = self.validation_chain(
             {
                 "query": query,
@@ -84,7 +89,7 @@ class Agent(object):
         self.logger.info("Time to validate request: {}".format(round(t2 - t1, 2)))
 
         if validation_test["plan_is_valid"].lower() == "no":
-            self.logger.warning("There is something wrong with the travel plan")
+            self.logger.warning("User request was not valid!")
             print("\n######\n Travel plan is not valid \n######\n")
             print(validation_test["updated_request"])
             return validation_result, _
@@ -94,6 +99,10 @@ class Agent(object):
             self.logger.info("Query is valid")
             self.logger.info("Getting travel suggestions")
             t1 = time.time()
+
+            self.logger.info(
+                "User request is valid, calling agent (model is {})".format(MODEL_NAME)
+            )
 
             agent_result = self.agent_chain(
                 {
