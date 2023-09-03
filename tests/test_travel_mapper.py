@@ -5,7 +5,7 @@
 
 import unittest
 
-from travel_mapper import travel_mapper
+from travel_mapper import test
 
 
 class TestTravel_mapper(unittest.TestCase):

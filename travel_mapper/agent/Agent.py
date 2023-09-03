@@ -7,11 +7,17 @@ from travel_mapper.agent.templates import (
 )
 from travel_mapper.constants import MODEL_NAME, TEMPERATURE
 import openai
+import logging
+import time
+
+logging.basicConfig(level=logging.INFO)
 
 
 class Agent(object):
     def __init__(self, open_ai_api_key, debug=True):
         openai.api_key = open_ai_api_key
+        self.logger = logging.getLogger(__name__)
+        self.logger.setLevel(logging.INFO)
         self.chat_model = ChatOpenAI(model=MODEL_NAME, temperature=TEMPERATURE)
         self.validation_prompt = ValidationTemplate()
         self.itinerary_prompt = ItineraryTemplate()
@@ -64,6 +70,8 @@ class Agent(object):
         return overall_chain
 
     def suggest_travel(self, query):
+        self.logger.info("Validating query")
+        t1 = time.time()
         validation_result = self.validation_chain(
             {
                 "query": query,
@@ -72,14 +80,20 @@ class Agent(object):
         )
 
         validation_test = validation_result["validation_output"].dict()
+        t2 = time.time()
+        self.logger.info("Time to validate request: {}".format(round(t2 - t1, 2)))
 
         if validation_test["plan_is_valid"].lower() == "no":
+            self.logger.warning("There is something wrong with the travel plan")
             print("\n######\n Travel plan is not valid \n######\n")
             print(validation_test["updated_request"])
             return validation_result, _
 
         else:
             # plan is valid
+            self.logger.info("Query is valid")
+            self.logger.info("Getting travel suggestions")
+            t1 = time.time()
 
             agent_result = self.agent_chain(
                 {
@@ -90,5 +104,7 @@ class Agent(object):
 
             trip_suggestion = agent_result["agent_suggestion"]
             list_of_places = agent_result["mapping_list"].dict()
+            t2 = time.time()
+            self.logger.info("Time to get suggestions: {}".format(round(t2 - t1, 2)))
 
             return trip_suggestion, list_of_places
