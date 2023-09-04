@@ -12,12 +12,15 @@ import time
 
 logging.basicConfig(level=logging.INFO)
 
+
 class Agent(object):
-    def __init__(self, open_ai_api_key, debug=True):
+    def __init__(
+        self, open_ai_api_key, model=MODEL_NAME, temperature=TEMPERATURE, debug=True
+    ):
         openai.api_key = open_ai_api_key
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(logging.INFO)
-        self.chat_model = ChatOpenAI(model=MODEL_NAME, temperature=TEMPERATURE)
+        self.chat_model = ChatOpenAI(model=model, temperature=temperature)
         self.validation_prompt = ValidationTemplate()
         self.itinerary_prompt = ItineraryTemplate()
         self.mapping_prompt = MappingTemplate()
@@ -75,7 +78,9 @@ class Agent(object):
         self.logger.info("Validating query")
         t1 = time.time()
         self.logger.info(
-            "Calling validation (model is {}) on user input".format(MODEL_NAME)
+            "Calling validation (model is {}) on user input".format(
+                self.chat_model.model_name
+            )
         )
         validation_result = self.validation_chain(
             {
@@ -84,7 +89,7 @@ class Agent(object):
             }
         )
 
-        validation_test = validation_result["validation_output"].model_dump()
+        validation_test = validation_result["validation_output"].dict()
         t2 = time.time()
         self.logger.info("Time to validate request: {}".format(round(t2 - t1, 2)))
 
@@ -92,7 +97,7 @@ class Agent(object):
             self.logger.warning("User request was not valid!")
             print("\n######\n Travel plan is not valid \n######\n")
             print(validation_test["updated_request"])
-            return validation_result, _
+            return None, None, validation_result
 
         else:
             # plan is valid
@@ -101,7 +106,9 @@ class Agent(object):
             t1 = time.time()
 
             self.logger.info(
-                "User request is valid, calling agent (model is {})".format(MODEL_NAME)
+                "User request is valid, calling agent (model is {})".format(
+                    self.chat_model.model_name
+                )
             )
 
             agent_result = self.agent_chain(
@@ -112,8 +119,8 @@ class Agent(object):
             )
 
             trip_suggestion = agent_result["agent_suggestion"]
-            list_of_places = agent_result["mapping_list"].model_dump()
+            list_of_places = agent_result["mapping_list"].dict()
             t2 = time.time()
             self.logger.info("Time to get suggestions: {}".format(round(t2 - t1, 2)))
 
-            return trip_suggestion, list_of_places
+            return trip_suggestion, list_of_places, validation_result

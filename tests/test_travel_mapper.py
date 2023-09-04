@@ -5,7 +5,7 @@
 
 import unittest
 
-from travel_mapper import test
+from travel_mapper import test_without_gradio
 
 
 class TestTravel_mapper(unittest.TestCase):

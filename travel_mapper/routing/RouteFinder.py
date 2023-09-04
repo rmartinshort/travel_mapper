@@ -8,6 +8,7 @@ import time
 
 logging.basicConfig(level=logging.INFO)
 
+
 class RouteFinder:
     MAX_WAYPOINTS_API_CALL = 23
 
