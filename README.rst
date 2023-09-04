@@ -16,8 +16,23 @@ travel_mapper
 
 
 
-A travel agent that uses calls to OpenAI to build an itinerary and then Google Maps API to gather directions
+A travel agent that uses calls to OpenAI to build an itinerary and then Google Maps API to gather directions.
 
+To test it out in a python console, try the following
+
+```
+from travel_mapper.test_without_gradio import test
+test()
+```
+
+This will use a default query and is useful to check if everything is installed correctly. You can also run
+`test()` with a custom query, as in `test(query="A 2 day trip around Los Angeles that includes the best views of the Hollywood sign")`.
+
+To run the gradio app, which allows more interactions with the models, run the following from a terminal
+
+```python travel_mapper/user_interface/driver.py```
+
+This will open the app locally.
 
 * Free software: MIT license
 * Documentation: https://travel-mapper.readthedocs.io.

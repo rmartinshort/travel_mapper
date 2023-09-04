@@ -54,6 +54,7 @@ class TravelMapper(object):
         return itinerary, validation
 
     def generate_with_leafmap(self, query, model_name):
+
         # set the model name to call
         self.travel_agent.chat_model.model_name = model_name
         itinerary, list_of_places, validation = self.travel_agent.suggest_travel(query)
