@@ -84,7 +84,7 @@ class Agent(object):
             }
         )
 
-        validation_test = validation_result["validation_output"].dict()
+        validation_test = validation_result["validation_output"].model_dump()
         t2 = time.time()
         self.logger.info("Time to validate request: {}".format(round(t2 - t1, 2)))
 
@@ -112,7 +112,7 @@ class Agent(object):
             )
 
             trip_suggestion = agent_result["agent_suggestion"]
-            list_of_places = agent_result["mapping_list"].dict()
+            list_of_places = agent_result["mapping_list"].model_dump()
             t2 = time.time()
             self.logger.info("Time to get suggestions: {}".format(round(t2 - t1, 2)))
 
