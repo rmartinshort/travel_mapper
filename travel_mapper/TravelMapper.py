@@ -1,6 +1,10 @@
 from travel_mapper.agent.Agent import Agent
 from travel_mapper.routing.RouteFinder import RouteFinder
-from travel_mapper.user_interface.utils import generate_leafmap, validation_message, generate_generic_leafmap
+from travel_mapper.user_interface.utils import (
+    generate_leafmap,
+    validation_message,
+    generate_generic_leafmap,
+)
 from dotenv import load_dotenv
 from pathlib import Path
 from travel_mapper.user_interface.constants import VALID_MESSAGE

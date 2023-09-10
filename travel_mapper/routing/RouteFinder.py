@@ -190,43 +190,88 @@ class RouteFinder:
             departure_time=start_time,
         )
 
-        if not directions_result:
+        # test
+        directions_result = []
+
+        if directions_result:
+            full_route = self.get_route(directions_result)
+
+        else:
             # if we get here, the google maps call has failed. This is probably because
             # the waypoints were not found. We can still make a map by just using the
             # start and end locations but we need to warn the user that the map won't contain
             # the waypoints
 
             self.logger.warning(
-                "WARNING, some of the waypoints {} seem to "
+                "WARNING, some of the waypoints {} seem to"
                 "have caused issues with the google maps api".format(waypoints)
             )
 
             self.logger.warning(
-                "Directions will just be between start {} and end {}".format(start, end)
+                "Will attempt to step through the directions point by point".format(
+                    start, end
+                )
             )
 
-            directions_result = self.gmaps.directions(
-                start, end, units="metric", optimize_waypoints=True
-            )
+            all_points = [start] + waypoints + [end]
+            start_time = datetime.now()
+            final_route_dict = {}
+            directions_list = []
+            for i in range(1, len(all_points)):
+                # iterate edge by edge and get the directions between
+                # the points. For some reason this seems better able to
+                # deal with remote waypoints than if we enter "waypoints"
+                # into the directions call
+                p1 = all_points[i]
+                p0 = all_points[i - 1]
+
+                directions_result = self.gmaps.directions(
+                    p0,
+                    p1,
+                    units="metric",
+                    mode=transit_type,
+                    departure_time=start_time,
+                )
+                if directions_result:
+                    route_dict = self.get_route(directions_result)
+                    final_route_dict[i - 1] = route_dict[0]
+                directions_list += directions_result
+
+            directions_result = directions_list
+            full_route = final_route_dict
 
         if verbose:
             print("# " * 10)
             print("Fetched directions")
             print("# " * 10)
-            # print out some stats for the legs of the proposed trip
-            for i, leg in enumerate(directions_result[0]["legs"]):
-                print(
-                    "Stop:" + str(i),
-                    leg["start_address"],
-                    "==> ",
-                    leg["end_address"],
-                    "distance (km): ",
-                    leg["distance"]["value"] / 1000,
-                    "traveling Time (hrs): ",
-                    leg["duration"]["value"] / 3600,
-                )
 
-        full_route = self.get_route(directions_result)
+            if len(directions_result) == 1:
+                # print out some stats for the legs of the proposed trip
+                for i, leg in enumerate(directions_result[0]["legs"]):
+                    print(
+                        "Stop:" + str(i),
+                        leg["start_address"],
+                        "==> ",
+                        leg["end_address"],
+                        "distance (km): ",
+                        leg["distance"]["value"] / 1000,
+                        "traveling Time (hrs): ",
+                        leg["duration"]["value"] / 3600,
+                    )
+            else:
+                # if the directions result has been built from multiple calls
+                for i, leg in enumerate(directions_result):
+                    leg = leg["legs"][0]
+                    print(
+                        "Stop:" + str(i),
+                        leg["start_address"],
+                        "==> ",
+                        leg["end_address"],
+                        "distance (km): ",
+                        leg["distance"]["value"] / 1000,
+                        "traveling Time (hrs): ",
+                        leg["duration"]["value"] / 3600,
+                    )
 
         return directions_result, full_route
 

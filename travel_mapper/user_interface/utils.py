@@ -4,13 +4,13 @@ from travel_mapper.user_interface.constants import VALID_MESSAGE
 
 
 def validation_message(validiation_agent_response):
-    valid_plan = validiation_agent_response["validation_output"].dict()[
-        "plan_is_valid"
-    ].lower()
+    valid_plan = (
+        validiation_agent_response["validation_output"].dict()["plan_is_valid"].lower()
+    )
 
     if valid_plan.lower() == "no":
         validation_body = validiation_agent_response["validation_output"].dict()[
-        "updated_request"
+            "updated_request"
         ]
         validation_header = "The query is not valid in its current state. Here is a suggestion from the model: \n"
         validation = validation_header + validation_body
@@ -19,9 +19,9 @@ def validation_message(validiation_agent_response):
 
     return validation
 
-def generate_generic_leafmap():
 
-    map = leafmap.Map(location=[0,0], tiles="Stamen Terrain", zoom_start=3)
+def generate_generic_leafmap():
+    map = leafmap.Map(location=[0, 0], tiles="Stamen Terrain", zoom_start=3)
     return map.to_gradio()
 
 
