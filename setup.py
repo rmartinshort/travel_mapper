@@ -4,12 +4,15 @@
 
 from setuptools import setup, find_packages
 
+this_verison = "1.1.0"
+
 with open('README.rst') as readme_file:
     readme = readme_file.read()
 
 with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
+# read from requirements file
 requirements = [ ]
 
 test_requirements = [ ]
@@ -39,6 +42,6 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/rmartinshort/travel_mapper',
-    version='0.1.0',
+    version=this_verison,
     zip_safe=False,
 )

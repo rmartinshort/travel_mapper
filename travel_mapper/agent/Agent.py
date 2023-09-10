@@ -1,5 +1,6 @@
 from langchain.chains import LLMChain, SequentialChain
 from langchain.chat_models import ChatOpenAI
+from langchain.llms import GooglePalm
 from travel_mapper.agent.templates import (
     ValidationTemplate,
     ItineraryTemplate,
@@ -15,12 +16,33 @@ logging.basicConfig(level=logging.INFO)
 
 class Agent(object):
     def __init__(
-        self, open_ai_api_key, model=MODEL_NAME, temperature=TEMPERATURE, debug=True
+        self,
+        open_ai_api_key,
+        google_palm_api_key,
+        model=MODEL_NAME,
+        temperature=TEMPERATURE,
+        debug=True,
     ):
-        openai.api_key = open_ai_api_key
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(logging.INFO)
-        self.chat_model = ChatOpenAI(model=model, temperature=temperature)
+
+        if "gpt" in model:
+            # model is open ai
+            self.logger.info("Base LLM is OpenAI chatGPT series")
+            openai.api_key = open_ai_api_key
+            self.chat_model = ChatOpenAI(model=model, temperature=temperature)
+        elif "bison-001" in model:
+            # model is google palm
+            self.logger.info("Base LLM is Google Palm")
+            self.chat_model = GooglePalm(
+                model_name=model,
+                temperature=temperature,
+                google_api_key=google_palm_api_key,
+            )
+
+        self._palm_key = google_palm_api_key
+        self._openai_key = open_ai_api_key
+
         self.validation_prompt = ValidationTemplate()
         self.itinerary_prompt = ItineraryTemplate()
         self.mapping_prompt = MappingTemplate()
@@ -30,6 +52,20 @@ class Agent(object):
 
         self.validation_chain = self._set_up_validation_chain(debug)
         self.agent_chain = self._set_up_agent_chain(debug)
+
+    def update_model_family(self, new_model):
+        if "gpt" in new_model:
+            # model is open ai
+            self.logger.info("Base LLM is OpenAI chatGPT series")
+            self.chat_model = ChatOpenAI(model=new_model, temperature=TEMPERATURE)
+        elif "bison-001" in new_model:
+            # model is google palm
+            self.logger.info("Base LLM is Google Palm")
+            self.chat_model = GooglePalm(
+                model_name=new_model,
+                temperature=TEMPERATURE,
+                google_api_key=self._palm_key,
+            )
 
     def _set_up_validation_chain(self, debug=True):
         validation_agent = LLMChain(

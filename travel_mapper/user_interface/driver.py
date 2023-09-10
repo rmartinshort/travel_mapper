@@ -1,7 +1,8 @@
 import gradio as gr
 import sys
-from travel_mapper.TravelMapper import TravelMapper, load_secets, assert_secrets
+from travel_mapper.TravelMapper import TravelMapperForUI, load_secets, assert_secrets
 from travel_mapper.user_interface.capture_logs import PrintLogCapture
+from travel_mapper.user_interface.utils import generate_generic_leafmap
 from travel_mapper.user_interface.constants import EXAMPLE_QUERY
 
 
@@ -15,12 +16,17 @@ def main():
     secrets = load_secets()
     assert_secrets(secrets)
 
-    travel_mapper = TravelMapper(
+    travel_mapper = TravelMapperForUI(
         openai_api_key=secrets["OPENAI_API_KEY"],
         google_maps_key=secrets["GOOGLE_MAPS_API_KEY"],
+        google_palm_api_key=secrets["GOOGLE_PALM_API_KEY"],
     )
     sys.stdout = PrintLogCapture("output.log")
+
+    # build the UI in gradio
     app = gr.Blocks()
+
+    generic_map = generate_generic_leafmap()
 
     with app:
         gr.Markdown("## Generate travel suggestions")
@@ -34,7 +40,7 @@ def main():
 
                         radio_map = gr.Radio(
                             value="gpt-3.5-turbo",
-                            choices=["gpt-3.5-turbo", "gpt-4"],
+                            choices=["gpt-3.5-turbo", "gpt-4", "models/text-bison-001"],
                             label="models",
                         )
 
@@ -46,7 +52,7 @@ def main():
                         # app.load(read_logs, None, logs, every=1)
                     with gr.Column():
                         # place where the map will appear
-                        map_output = gr.HTML(label="Travel map")
+                        map_output = gr.HTML(generic_map, label="Travel map")
                         # place where the suggested trip will appear
                         itinerary_output = gr.Textbox(
                             value="Your itinerary will appear here",
@@ -63,7 +69,7 @@ def main():
 
                         radio_no_map = gr.Radio(
                             value="gpt-3.5-turbo",
-                            choices=["gpt-3.5-turbo", "gpt-4"],
+                            choices=["gpt-3.5-turbo", "gpt-4", "models/text-bison-001"],
                             label="Model choices",
                         )
 

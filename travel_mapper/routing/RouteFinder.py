@@ -197,7 +197,7 @@ class RouteFinder:
             # the waypoints
 
             self.logger.warning(
-                "WARNING, some of the waypoints {} seem to"
+                "WARNING, some of the waypoints {} seem to "
                 "have caused issues with the google maps api".format(waypoints)
             )
 
