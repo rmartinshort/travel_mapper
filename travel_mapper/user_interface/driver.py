@@ -1,5 +1,7 @@
-import gradio as gr
+#!/usr/bin/env python
+
 import sys
+import gradio as gr
 from travel_mapper.TravelMapper import TravelMapperForUI, load_secets, assert_secrets
 from travel_mapper.user_interface.capture_logs import PrintLogCapture
 from travel_mapper.user_interface.utils import generate_generic_leafmap
