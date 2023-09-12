@@ -191,7 +191,7 @@ class RouteFinder:
         )
 
         # test
-        #directions_result = []
+        # directions_result = []
 
         if directions_result:
             full_route = self.get_route(directions_result)

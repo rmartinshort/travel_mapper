@@ -49,6 +49,15 @@ To run the gradio app, which allows more interactions with the models, run the f
 
    python travel_mapper/user_interface/driver.py
 
+You can also use the run script, which sets the pythonpath correctly if it's
+run from the top level directory. You may need to give it permissions first
+
+.. code-block:: bash
+
+    travel_mapper/user_interface/run.sh
+
+
+
 
 You should then be able to open the app locally
 
