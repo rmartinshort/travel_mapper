@@ -2,7 +2,7 @@
 
 import sys
 import gradio as gr
-from travel_mapper.TravelMapper import TravelMapperForUI, load_secets, assert_secrets
+from travel_mapper.TravelMapper import TravelMapperForUI, load_secrets, assert_secrets
 from travel_mapper.user_interface.capture_logs import PrintLogCapture
 from travel_mapper.user_interface.utils import generate_generic_leafmap
 from travel_mapper.user_interface.constants import EXAMPLE_QUERY
@@ -21,7 +21,7 @@ def main():
     -------
 
     """
-    secrets = load_secets()
+    secrets = load_secrets()
     assert_secrets(secrets)
 
     travel_mapper = TravelMapperForUI(
