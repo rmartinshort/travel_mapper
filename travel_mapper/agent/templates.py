@@ -81,11 +81,15 @@ class ItineraryTemplate(object):
       Try to include the specific address of each location.
 
       Remember to take the user's preferences and timeframe into account,
-      and give them an itinerary that would be fun and doable given their constraints.
+      and give them an itinerary that would be fun and realistic given their constraints.
+      
+      Try to make sure the user doesn't need to travel for more than 8 hours on any one day during
+      their trip.
 
-      Return the itinerary as a bulleted list with clear start and end locations.
-      Be sure to mention the type of transit for the trip.
+      Return the itinerary as a bulleted list with clear start and end locations and mention the type of transit for the trip.
+      
       If specific start and end locations are not given, choose ones that you think are suitable and give specific addresses.
+      
       Your output must be the list and nothing else.
     """
 
@@ -110,7 +114,7 @@ class MappingTemplate(object):
         self.system_template = """
       You an agent who converts detailed travel plans into a simple list of locations.
 
-      The itinerary will be denoted by four hastags. Convert it into
+      The itinerary will be denoted by four hashtags. Convert it into
       list of places that they should visit. Try to include the specific address of each location.
 
       Your output should always contain the start and end point of the trip, and may also include a list
