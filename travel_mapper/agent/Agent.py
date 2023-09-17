@@ -47,13 +47,21 @@ class Agent(object):
         self.itinerary_prompt = ItineraryTemplate()
         self.mapping_prompt = MappingTemplate()
 
-        self.logger = logging.getLogger(__name__)
-        self.logger.setLevel(logging.INFO)
-
         self.validation_chain = self._set_up_validation_chain(debug)
         self.agent_chain = self._set_up_agent_chain(debug)
 
     def update_model_family(self, new_model):
+        """
+
+        Parameters
+        ----------
+        new_model
+
+        Returns
+        -------
+
+        """
+
         if "gpt" in new_model:
             # model is open ai
             self.logger.info("Base LLM is OpenAI chatGPT series")
@@ -68,6 +76,16 @@ class Agent(object):
             )
 
     def _set_up_validation_chain(self, debug=True):
+        """
+
+        Parameters
+        ----------
+        debug
+
+        Returns
+        -------
+
+        """
         validation_agent = LLMChain(
             llm=self.chat_model,
             prompt=self.validation_prompt.chat_prompt,
@@ -86,6 +104,16 @@ class Agent(object):
         return overall_chain
 
     def _set_up_agent_chain(self, debug=True):
+        """
+
+        Parameters
+        ----------
+        debug
+
+        Returns
+        -------
+
+        """
         travel_agent = LLMChain(
             llm=self.chat_model,
             prompt=self.itinerary_prompt.chat_prompt,
@@ -111,6 +139,16 @@ class Agent(object):
         return overall_chain
 
     def suggest_travel(self, query):
+        """
+
+        Parameters
+        ----------
+        query
+
+        Returns
+        -------
+
+        """
         self.logger.info("Validating query")
         t1 = time.time()
         self.logger.info(

@@ -19,6 +19,18 @@ class RouteFinder:
         self.gmaps = googlemaps.Client(key=google_maps_api_key)
 
     def generate_route(self, list_of_places, itinerary, include_map=True):
+        """
+
+        Parameters
+        ----------
+        list_of_places
+        itinerary
+        include_map
+
+        Returns
+        -------
+
+        """
         self.logger.info("# " * 20)
         self.logger.info("PROPOSED ITINERARY")
         self.logger.info("# " * 20)
@@ -43,6 +55,18 @@ class RouteFinder:
     def build_route_segments(
         self, list_of_places, verbose=True, sample_route_points=5000
     ):
+        """
+
+        Parameters
+        ----------
+        list_of_places
+        verbose
+        sample_route_points
+
+        Returns
+        -------
+
+        """
         number_of_stops = len(list_of_places["waypoints"])
 
         segment_mapping_dicts = []
@@ -124,9 +148,31 @@ class RouteFinder:
         return directions, sampled_route, mapping_dict
 
     def convert_to_coords(self, input_address):
+        """
+
+        Parameters
+        ----------
+        input_address
+
+        Returns
+        -------
+
+        """
         return self.gmaps.geocode(input_address)
 
     def build_mapping_dict(self, start, end, waypoints):
+        """
+
+        Parameters
+        ----------
+        start
+        end
+        waypoints
+
+        Returns
+        -------
+
+        """
         mapping_dict = {}
         mapping_dict["start"] = self.convert_to_coords(start)[0]
         mapping_dict["end"] = self.convert_to_coords(end)[0]
@@ -141,6 +187,16 @@ class RouteFinder:
 
     @staticmethod
     def get_route(directions_result):
+        """
+
+        Parameters
+        ----------
+        directions_result
+
+        Returns
+        -------
+
+        """
         waypoints = {}
 
         for leg_number, leg in enumerate(directions_result[0]["legs"]):
@@ -165,6 +221,19 @@ class RouteFinder:
     def build_directions_and_route(
         self, mapping_dict, start_time=None, transit_type=None, verbose=True
     ):
+        """
+
+        Parameters
+        ----------
+        mapping_dict
+        start_time
+        transit_type
+        verbose
+
+        Returns
+        -------
+
+        """
         if not start_time:
             start_time = datetime.now()
 
@@ -277,6 +346,17 @@ class RouteFinder:
 
     @staticmethod
     def assemble_final_route_from_segments(segment_mapping_dicts, sampled_routes):
+        """
+
+        Parameters
+        ----------
+        segment_mapping_dicts
+        sampled_routes
+
+        Returns
+        -------
+
+        """
         final_mapping_dict = {}
         final_sampled_route = {}
 
@@ -309,6 +389,17 @@ class RouteFinder:
 
     @staticmethod
     def sample_route_with_legs(route, npoints=1000):
+        """
+
+        Parameters
+        ----------
+        route
+        npoints
+
+        Returns
+        -------
+
+        """
         points_per_leg = [len(v["route"]) for k, v in route.items()]
         total_points = sum(points_per_leg)
 

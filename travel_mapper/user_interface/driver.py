@@ -15,6 +15,12 @@ def read_logs():
 
 
 def main():
+    """
+
+    Returns
+    -------
+
+    """
     secrets = load_secets()
     assert_secrets(secrets)
 

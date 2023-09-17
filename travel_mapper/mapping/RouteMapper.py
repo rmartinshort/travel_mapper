@@ -18,9 +18,29 @@ class RouteMapper:
         self.map = None
 
     def add_list_of_places(self, list_of_places):
+        """
+
+        Parameters
+        ----------
+        list_of_places
+
+        Returns
+        -------
+
+        """
         self.map_name = self.auto_generate_map_name(list_of_places)
 
     def auto_generate_map_name(self, list_of_places):
+        """
+
+        Parameters
+        ----------
+        list_of_places
+
+        Returns
+        -------
+
+        """
         return "{}_{}_{}_trip.html".format(
             str(datetime.today().date()).replace("-", "_"),
             list_of_places["start"].split(",")[0].replace(" ", "_"),
@@ -28,10 +48,32 @@ class RouteMapper:
         )
 
     def generate_and_display(self, directions_list, route_dict):
+        """
+
+        Parameters
+        ----------
+        directions_list
+        route_dict
+
+        Returns
+        -------
+
+        """
         map = self.generate_route_map(self, directions_list, route_dict)
         self.figure.add_child(map)
 
     def generate_route_map(self, directions_list, route_dict):
+        """
+
+        Parameters
+        ----------
+        directions_list
+        route_dict
+
+        Returns
+        -------
+
+        """
         map_start_loc_lat = directions_list[0]["legs"][0]["start_location"]["lat"]
         map_start_loc_lon = directions_list[0]["legs"][0]["start_location"]["lng"]
         map_start_loc = [map_start_loc_lat, map_start_loc_lon]

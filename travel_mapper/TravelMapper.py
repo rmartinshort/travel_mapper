@@ -11,7 +11,7 @@ from travel_mapper.user_interface.constants import VALID_MESSAGE
 import os
 
 
-def load_secets():
+def load_secrets():
     load_dotenv()
     env_path = Path(".") / ".env"
     load_dotenv(dotenv_path=env_path)
@@ -57,6 +57,16 @@ class TravelMapperBase(object):
 
 class TravelMapperForUI(TravelMapperBase):
     def _model_type_switch(self, new_model_name):
+        """
+
+        Parameters
+        ----------
+        new_model_name
+
+        Returns
+        -------
+
+        """
         current_model_name = self.travel_agent.chat_model.model_name
         if ("gpt" in current_model_name and "gpt" not in new_model_name) or (
             "bison" in current_model_name and "bison" not in new_model_name
@@ -67,6 +77,17 @@ class TravelMapperForUI(TravelMapperBase):
             self.travel_agent.chat_model.model_name = new_model_name
 
     def generate_without_leafmap(self, query, model_name):
+        """
+
+        Parameters
+        ----------
+        query
+        model_name
+
+        Returns
+        -------
+
+        """
         self._model_type_switch(model_name)
 
         itinerary, list_of_places, validation = self.travel_agent.suggest_travel(query)
@@ -80,6 +101,17 @@ class TravelMapperForUI(TravelMapperBase):
         return itinerary, validation_string
 
     def generate_with_leafmap(self, query, model_name):
+        """
+
+        Parameters
+        ----------
+        query
+        model_name
+
+        Returns
+        -------
+
+        """
         self._model_type_switch(model_name)
 
         itinerary, list_of_places, validation = self.travel_agent.suggest_travel(query)

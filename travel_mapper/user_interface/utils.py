@@ -4,6 +4,16 @@ from travel_mapper.user_interface.constants import VALID_MESSAGE
 
 
 def validation_message(validiation_agent_response):
+    """
+
+    Parameters
+    ----------
+    validiation_agent_response
+
+    Returns
+    -------
+
+    """
     valid_plan = (
         validiation_agent_response["validation_output"].dict()["plan_is_valid"].lower()
     )
@@ -21,11 +31,28 @@ def validation_message(validiation_agent_response):
 
 
 def generate_generic_leafmap():
+    """
+
+    Returns
+    -------
+
+    """
     map = leafmap.Map(location=[0, 0], tiles="Stamen Terrain", zoom_start=3)
     return map.to_gradio()
 
 
 def generate_leafmap(directions_list, sampled_route):
+    """
+
+    Parameters
+    ----------
+    directions_list
+    sampled_route
+
+    Returns
+    -------
+
+    """
     map_start_loc_lat = directions_list[0]["legs"][0]["start_location"]["lat"]
     map_start_loc_lon = directions_list[0]["legs"][0]["start_location"]["lng"]
     map_start_loc = [map_start_loc_lat, map_start_loc_lon]
