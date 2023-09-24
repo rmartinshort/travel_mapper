@@ -53,7 +53,7 @@ class RouteFinder:
         return directions, sampled_route, mapping_dict
 
     def build_route_segments(
-        self, list_of_places, verbose=True, sample_route_points=5000
+        self, list_of_places, verbose=True, distance_per_point_in_km=0.25
     ):
         """
 
@@ -112,7 +112,7 @@ class RouteFinder:
                     mapping_dict, verbose=verbose
                 )
                 sampled_route = self.sample_route_with_legs(
-                    route, npoints=sample_route_points
+                    route, distance_per_point_in_km
                 )
 
                 directions_list += directions
@@ -141,9 +141,7 @@ class RouteFinder:
 
             self.logger.info("Calling Google Maps API to get directions")
             directions, route = self.build_directions_and_route(mapping_dict)
-            sampled_route = self.sample_route_with_legs(
-                route, npoints=sample_route_points
-            )
+            sampled_route = self.sample_route_with_legs(route, distance_per_point_in_km)
 
         return directions, sampled_route, mapping_dict
 
@@ -202,8 +200,7 @@ class RouteFinder:
         for leg_number, leg in enumerate(directions_result[0]["legs"]):
             leg_route = {}
 
-            distance = leg["distance"]["text"]
-            duration = leg["duration"]["text"]
+            distance, duration = leg["distance"]["text"], leg["duration"]["text"]
             leg_route["distance"] = distance
             leg_route["duration"] = duration
             leg_route_points = []
@@ -398,7 +395,7 @@ class RouteFinder:
         return final_mapping_dict, final_sampled_route
 
     @staticmethod
-    def sample_route_with_legs(route, npoints=1000):
+    def sample_route_with_legs(route, distance_per_point_in_km=0.25):
         """
 
         Parameters
@@ -410,18 +407,25 @@ class RouteFinder:
         -------
 
         """
+        # get total distance
+        all_distances = sum([float(route[i]["distance"].split(" ")[0]) for i in route])
+
+        # find distance per point
+        npoints = int(np.ceil(all_distances / distance_per_point_in_km))
+
+        # get actual points per leg
         points_per_leg = [len(v["route"]) for k, v in route.items()]
         total_points = sum(points_per_leg)
 
         # get fraction of total points that need to be represented on each leg
-        frac_per_leg = [
+        n_sampled_per_leg = [
             max(1, np.round(npoints * (x / total_points), 0)) for x in points_per_leg
         ]
 
         sampled_points = {}
         for leg_id, route_info in route.items():
             total_points = int(points_per_leg[leg_id])
-            total_sampled_points = int(frac_per_leg[leg_id])
+            total_sampled_points = int(n_sampled_per_leg[leg_id])
             step_size = int(max(total_points // total_sampled_points, 1.0))
             route_sampled = [
                 route_info["route"][idx] for idx in range(0, total_points, step_size)
