@@ -408,7 +408,7 @@ class RouteFinder:
 
         """
         # get total distance
-        all_distances = sum([float(route[i]["distance"].split(" ")[0]) for i in route])
+        all_distances = sum([float(route[i]["distance"].split(" ")[0].replace(",","")) for i in route])
 
         # find distance per point
         npoints = int(np.ceil(all_distances / distance_per_point_in_km))
