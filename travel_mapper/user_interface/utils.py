@@ -37,7 +37,7 @@ def generate_generic_leafmap():
     -------
 
     """
-    map = leafmap.Map(location=[0, 0], tiles="Stamen Terrain", zoom_start=3)
+    map = leafmap.Map(location=[0, 0], tiles="OpenStreetMap", zoom_start=3)
     return map.to_gradio()
 
 
@@ -76,7 +76,7 @@ def generate_leafmap(directions_list, sampled_route):
         )
     )
 
-    map = leafmap.Map(location=map_start_loc, tiles="Stamen Terrain", zoom_start=8)
+    map = leafmap.Map(location=map_start_loc, tiles="OpenStreetMap", zoom_start=8)
 
     # Add waypoint markers to the map
     for location, address in marker_points:

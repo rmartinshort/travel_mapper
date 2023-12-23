@@ -100,7 +100,7 @@ class RouteMapper:
 
         self.logger.info("Setting up the map")
 
-        map = folium.Map(location=map_start_loc, tiles="cartodbpositron", zoom_start=10)
+        map = folium.Map(location=map_start_loc, tiles="OpenStreetMap", zoom_start=10)
 
         # Add waypoint markers to the map
         for location, address in marker_points:
